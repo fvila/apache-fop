@@ -51,7 +51,7 @@ class Fop
 		$process->add ( $outputFormat );
 		$process->add ( "-" );
 
-		foreach ($parameters as $key => $value) {
+		foreach ($xslParameters as $key => $value) {
 			$process->add("-param");
 			$process->add($key);
 			$process->add($value);
