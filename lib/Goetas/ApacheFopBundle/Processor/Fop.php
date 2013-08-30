@@ -13,55 +13,64 @@ class Fop
 	
 	protected $fopExecutable;
 	protected $javaExecutable;
+
+	protected $xslParameters = array();
 	
 	protected $configurationFile;
 	
 	public function __construct($fopExecutable) {
 		$this->setFopExecutable($fopExecutable);
 	}
-	public function convertToPdf($source, $destination, $xsl = null) {
-		return $this->convert($source, $destination, self::OTUPUT_PDF, $xsl);
+	public function convertToPdf($source, $xsl = null) {
+		return $this->convert($source, self::OTUPUT_PDF, $xsl);
 	}
-	public function convertToRtf($source, $destination, $xsl = null) {
-		return $this->convert($source, $destination, self::OTUPUT_RTF, $xsl);
+	public function convertToRtf($source, $xsl = null) {
+		return $this->convert($source, self::OTUPUT_RTF, $xsl);
 	}
-	public function convert($source, $destination, $outputFormat, $xsl = null) {
+	public function convert($source, $outputFormat, $xsl = null) {
 		
 		$process = new ProcessBuilder ();
+		$process->setInput($source);
 		$process->add ( $this->fopExecutable );
 		
 		$process->add ( "-q" );
 		$process->add ( "-r" );
 		
 		if($xsl!==null){
-			$process->add ( "-xml" );
+			$process->add ( "-xml -" );
 			$process->add ( $source );
 			
 			$process->add ( "-xsl" );
 			$process->add ( $xsl );
 		}else{
-			$process->add ( "-fo" );
+			$process->add ( "-fo -" );
 			$process->add ( $source );
 		}
 		
 		$process->add ( "-out" );
 		$process->add ( $outputFormat );
-		$process->add ( $destination );
+		$process->add ( "-" );
+
+		foreach ($parameters as $key => $value) {
+			$process->add("-param");
+			$process->add($key);
+			$process->add($value);
+		}
 		
 		if ($this->configurationFile !== null) {		
 			$process->add ( "-c" );
 			$process->add ( $this->configurationFile );
 		}
-		$msg = array();
-		
-		$esito = $process->getProcess ()->run (function ($a, $b) use (&$msg){
-			$msg[]=$b; 
-		});
-		if($esito>0){
-			$e = new \Exception("Apache FOP exception.\n".implode("\n", $msg));
+
+		$p = $process->getProcess();
+		$p->run();
+
+		if(!$p->isSuccessful()){
+			$e = new \Exception("Apache FOP exception.\n".implode("\n", $p->getErrorOutput()));
 			throw new \RuntimeException("Can't generage the document", null, $e);
 		}
-		return true;
+		
+		return $p->getOutput();
 	}
 	public function getFopExecutable() {
 		return $this->fopExecutable;
@@ -92,5 +101,8 @@ class Fop
 		$this->javaExecutable = $javaExecutable;
 	}
 
+	public function addParam($name, $value) {
+		$xslParameters[$name] = $value;	
+	}
 
 }

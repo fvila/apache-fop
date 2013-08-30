@@ -9,6 +9,10 @@
         {
             "name": "Asmir Mustafic",
             "email": "goetas@lignano.it"
+        },
+        {
+            "name": "Francesc Vila",
+            "email": "francesc.vila@gmail.com"
         }
     ],
     "require": {
@@ -20,7 +24,7 @@
     },
     "extra":{
         "branch-alias": {
-            "dev-master": "1.0-dev"
+            "dev-master": "1.0-stdout-fix"
         }
     }
 }
