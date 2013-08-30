@@ -73,7 +73,7 @@ class Fop
 			$e = new \Exception("Apache FOP exception.\n" . $p->getErrorOutput());
 			throw new \RuntimeException("Can't generate the document", null, $e);
 		}
-		
+
 		return $p->getOutput();
 	}
 	public function getFopExecutable() {
@@ -106,7 +106,7 @@ class Fop
 	}
 
 	public function addParam($name, $value) {
-		$xslParameters[$name] = $value;	
+		$this->xslParameters[$name] = $value;	
 	}
 
 }
