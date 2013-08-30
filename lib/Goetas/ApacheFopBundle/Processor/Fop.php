@@ -66,7 +66,7 @@ class Fop
 		$p->run();
 
 		if(!$p->isSuccessful()){
-			$e = new \Exception("Apache FOP exception.\n".implode("\n", $p->getErrorOutput()));
+			$e = new \Exception("Apache FOP exception.\n" . $p->getErrorOutput());
 			throw new \RuntimeException("Can't generage the document", null, $e);
 		}
 		
