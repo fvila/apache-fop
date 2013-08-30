@@ -33,28 +33,32 @@ class Fop
 		$process->setInput($source);
 		$process->add ( $this->fopExecutable );
 		
-		$process->add ( "-q" );
-		$process->add ( "-r" );
-		
-		if($xsl!==null){
-			$process->add ( "-xml -" );
-			$process->add ( $source );
-			
-			$process->add ( "-xsl" );
-			$process->add ( $xsl );
-		}else{
-			$process->add ( "-fo -" );
-			$process->add ( $source );
-		}
-		
-		$process->add ( "-out" );
-		$process->add ( $outputFormat );
-		$process->add ( "-" );
+		/* $process->add ( "-q" ); */
+		/* $process->add ( "-r" ); */
 
-		foreach ($this->xslParameters as $key => $value) {
+        foreach ($this->xslParameters as $key => $value) {
 			$process->add("-param");
 			$process->add($key);
 			$process->add($value);
+		}
+        
+		if($xsl!==null){
+			$process->add ( "-xsl" );
+			$process->add ( $xsl );
+
+            $process->add ( "-out" );
+            $process->add ( $outputFormat );
+            $process->add ( "-" );
+
+            $process->add ("-xml");
+            $process->add ("-");
+		}else{
+            die ("Not tested");
+			$process->add ( "-fo -" );
+
+            $process->add ( "-out" );
+            $process->add ( $outputFormat );
+            $process->add ( "-" );
 		}
 		
 		if ($this->configurationFile !== null) {		
@@ -67,7 +71,7 @@ class Fop
 
 		if(!$p->isSuccessful()){
 			$e = new \Exception("Apache FOP exception.\n" . $p->getErrorOutput());
-			throw new \RuntimeException("Can't generage the document", null, $e);
+			throw new \RuntimeException("Can't generate the document", null, $e);
 		}
 		
 		return $p->getOutput();
